@@ -1,18 +1,46 @@
-<h1>File Integrity Management Home Lab</h1>
+# File Integrity Management Tool
 
-### [YouTube Demonstration](https://www.youtube.com/watch?v=v9GwEBLhqA4)
+A simple Python script to monitor and verify the integrity of files using SHA-256 hashing. This tool detects unauthorized changes to files, such as modifications, deletions, or additions, which could be caused by malware or accidental actions.
 
-<h2>Description</h2>
-Within the realm of system security, I conceived a pragmatic solution in the form of a Python-based file integrity management system. The crux of this endeavor was to ensure the sanctity and consistency of critical files residing within specified directories. The script operates as a vigilant sentinel, continuously scanning designated folders for any alterations: be it the birth of a new file, the subtle touch of modification, or the solemn act of deletion.
+## Features
+- Generate SHA-256 hashes for files in a directory.
+- Save hashes to a JSON file for future comparison.
+- Verify file integrity by comparing current hashes with saved hashes.
+- Detect and report changes, including:
+  - **Modified files**: Changes to file content.
+  - **Deleted files**: Files that are no longer present.
+  - **Added files**: New files in the directory.
 
-Utilizing Python's formidable capabilities, the script encapsulates a meticulous algorithm. Upon detecting any deviation from the established file states, it promptly dispatches notifications to my attention. These alerts serve as beacons, illuminating the otherwise obscure pathways of file manipulation. Through this proactive approach, I am empowered to swiftly intervene in the event of any unauthorized or anomalous activities, thereby fortifying the integrity and resilience of the system against potential threats.
+## Requirements
+- Python 3.x
 
-At its core, this project embodies the marriage of simplicity and efficacy. While the concept may seem straightforward, its execution demanded a synthesis of precision and foresight. Each line of code is a testament to a strategic blend of logic and ingenuity, engineered to navigate the labyrinthine landscapes of digital security. By imbuing this system with the prowess to discern even the faintest whispers of change, I have forged a robust bastion against the tides of uncertainty and intrusion.
+## Installation
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yassinebenjaber/file-int-mgmt.git
+2. Navigate to the project directory:
+   ```bash
+   cd file-int-mgmt
+  ## Usage
+1. Generate Hashes:
+   To generate hashes for files in a directory and save them to hashes.json:
+   ```bash
+   python file_int_mgmt.py --generate /path/to/directory
+2. Verify Intergreity:
+   To verify the integrity of files by comparing their current hashes with the saved hashes:
+   ```bash
+   python file_int_mgmt.py --verify /path/to/directory
+3. Output:
+   If no changes are detected, the script will output: **All files are intact**.
 
-In a world where the digital realm is fraught with peril, this project stands as a testament to resilience and vigilance. Through its unyielding watchfulness, it upholds the sanctity of data and the integrity of systems, ensuring that even amidst the tumultuous currents of cyberspace, there exists an unwavering beacon of security and stability.
-<br />
+   If changes are detected, the script will report:
 
+     Modified files: Files with changed content.
 
+     Deleted files: Files that are missing.
+
+     Added files: New files in the directory.
+     
 <h2>Languages and Utilities Used</h2>
 
 - <b>PowerShell</b>
