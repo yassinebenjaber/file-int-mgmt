@@ -1,55 +1,51 @@
-# File Integrity Management Tool (FIM)
+# File Integrity Monitoring (FIM) Tool
 
-A PowerShell script to monitor and verify the integrity of files in a directory using SHA-256 hashing. This tool detects changes such as file modifications, deletions, additions, and renames, providing real-time alerts with color-coded outputs.
+## Description
+This tool monitors file integrity by tracking changes in a specified directory. It uses SHA-256 hashing to identify unauthorized file changes, ensuring data integrity and security. The tool can detect file additions, deletions, modifications, and renames.
 
-## Features
-- **Generate Hashes**: Create SHA-256 hashes for all `.txt` files in a directory and save them to a JSON file.
-- **Verify Integrity**: Compare current file hashes with saved hashes to detect changes.
-- **Real-Time Monitoring**: Monitor the directory for changes in real-time and receive instant alerts.
-- **Color-Coded Alerts**:
-  - **Yellow**: Modified files.
-  - **Red**: Deleted files.
-  - **Green**: Added files.
-  - **Magenta**: Renamed files.
-- **JSON Storage**: Hashes are stored in `hashes.json` for future comparisons.
+## How It Works
+1. **Baseline Collection**:  
+   - The tool scans the target directory and records the SHA-256 hash of each file.  
+   - This baseline serves as the reference point for future monitoring.  
 
-## Requirements
-- **PowerShell 5.1** or later.
-- **.NET Framework** (for SHA-256 hashing).
+2. **Real-Time Monitoring**:  
+   - The tool continuously monitors the directory for changes.  
+   - It compares the current file hashes with the baseline to detect any anomalies.  
 
-## Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yassinebenjaber/file-int-mgmt.git
-2. Navigate to the project directory:
-   ```bash
-   cd file-int-mgmt
-  ## Usage
-1. Generate Hashes + Integrity Verification + Real-time monitoring:
-   To generate SHA-256 hashes for all .txt files in a directory and save them to hashes.json:
-   ```bash
-   .\file_int_mgmt.ps1 -Directory "C:\path\to\directory"
-2. Output:
-If no changes are detected, the script will output: No changes detected (in cyan).
+3. **Change Detection**:  
+   The tool detects and reports the following events:  
+   - **File Added**: A new file is detected.  
+   - **File Modified**: An existing file's content has changed.  
+   - **File Renamed**: A file is renamed while retaining the same hash.  
+   - **File Deleted**: A file present in the baseline is no longer found.  
 
-If changes are detected, the script will report:
+4. **User Interaction**:  
+   - On execution, the tool prompts the user to either collect a new baseline or start monitoring.  
+   - The monitoring process runs indefinitely, displaying file activity in real-time.  
 
- - Modified files: Files with changed content (in yellow).
+## Technologies Used
+- **PowerShell**: Scripting language for automation and file integrity calculations.  
+- **SHA-256 Hashing**: Ensures reliable detection of file changes.  
 
- - Deleted files: Files that are missing (in red).
+## Environment
+- **Operating System**: Windows 10 or later.  
+- **Target Directory**: Configurable for any directory containing `.txt` files.  
 
- - Added files: New files in the directory (in green).
+## Practical Use Cases
+- Monitoring sensitive files for unauthorized modifications.  
+- Detecting accidental or malicious file deletions.  
+- Verifying file integrity in shared or critical directories.  
 
- - Renamed files: Files that have been renamed (in magenta).
-     
-<h2>Languages and Utilities Used</h2>
+## Limitations
+- Only monitors `.txt` files (can be modified to include other file types).  
+- Requires PowerShell 5.1 or later.  
 
-- <b>PowerShell ISE</b>
-- <b>Python
-  
-<h2>Environments Used </h2>
+This tool provides a simple yet effective way to enhance file integrity monitoring, supporting proactive security measures.  
+---
+*Start by running this command*:
+.\file_int_mgmt.ps1 -Directory "c:\target directory"
 
-- <b>Windows 11</b>
+
 
 
 
@@ -60,7 +56,7 @@ Flow chart demonstrating the FIM : <br/>
 <img src="https://imgur.com/YsKkgTb.png" height="80%" width="80%" alt="Disk Sanitization Steps"/>
 <br />
 <p align="center" >
-Testing folder before demonstration<br/>
+Target folder before demonstration<br/>
  <img src="https://imgur.com/Rx4tgry.png" height="80%" width="80%" alt="Disk Sanitization Steps"/>
 <br />
   <p align="center" >
@@ -68,8 +64,6 @@ Executing the script / Folder after demonstration<br/>
  <img src="https://imgur.com/FiBpyod.png" height="80%" width="80%" alt="Disk Sanitization Steps"/>
 <br />
 <br />
-
-https://imgur.com/9XbWlyi
 
 </p>
 
