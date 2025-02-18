@@ -43,7 +43,7 @@ A simple Python script to monitor and verify the integrity of files using SHA-25
      
 <h2>Languages and Utilities Used</h2>
 
-- <b>PowerShell</b>
+- <b>PowerShell ISE</b>
 - <b>Python
   
 <h2>Environments Used </h2>
