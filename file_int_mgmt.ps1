@@ -2,7 +2,7 @@ param (
     [string]$Directory
 )
 
-$HASH_FILE = "hashes.json"
+$BASELINE_FILE = "baseline.txt"
 
 # Function to calculate SHA-256 hash of a file
 function Calculate-Hash {
@@ -20,135 +20,66 @@ function Calculate-Hash {
     }
 }
 
-# Function to generate hashes for all files in the directory
-function Generate-Hashes {
+# Function to collect a new baseline
+function Collect-Baseline {
     param (
         [string]$Directory
     )
-    $hashes = @{}
+    $baseline = @{}
     Get-ChildItem -Path $Directory -Filter *.txt | ForEach-Object {
         $fileHash = Calculate-Hash -FilePath $_.FullName
         if ($fileHash) {
-            $hashes[$_.Name] = $fileHash
+            $baseline[$_.Name] = $fileHash
         }
     }
-    $hashes | ConvertTo-Json | Set-Content -Path $HASH_FILE
-    Write-Host "Hashes saved to $HASH_FILE" -ForegroundColor Cyan
+    $baseline | ConvertTo-Json | Set-Content -Path $BASELINE_FILE
+    Write-Host "New baseline collected and saved to $BASELINE_FILE" -ForegroundColor Cyan
 }
 
-# Function to verify file integrity
-function Verify-Hashes {
+# Function to monitor files using the saved baseline
+function Monitor-Files {
     param (
         [string]$Directory
     )
-    if (-not (Test-Path $HASH_FILE)) {
-        Write-Host "No hashes found. Please generate hashes first." -ForegroundColor Red
+    if (-not (Test-Path $BASELINE_FILE)) {
+        Write-Host "No baseline found. Please collect a new baseline first." -ForegroundColor Red
         return
     }
 
-    $savedHashes = Get-Content -Path $HASH_FILE | ConvertFrom-Json
-    $currentHashes = @{}
-    Get-ChildItem -Path $Directory -Filter *.txt | ForEach-Object {
-        $fileHash = Calculate-Hash -FilePath $_.FullName
-        if ($fileHash) {
-            $currentHashes[$_.Name] = $fileHash
-        }
-    }
-
-    # Check for modified, deleted, and added files
-    $modifiedFiles = @()
-    $deletedFiles = @()
-    $addedFiles = @()
-
-    foreach ($filename in $savedHashes.PSObject.Properties.Name) {
-        if (-not $currentHashes.ContainsKey($filename)) {
-            $deletedFiles += $filename
-        } elseif ($currentHashes[$filename] -ne $savedHashes.$filename) {
-            $modifiedFiles += $filename
-        }
-    }
-
-    foreach ($filename in $currentHashes.Keys) {
-        if (-not $savedHashes.PSObject.Properties.Name.Contains($filename)) {
-            $addedFiles += $filename
-        }
-    }
-
-    if ($modifiedFiles.Count -gt 0 -or $deletedFiles.Count -gt 0 -or $addedFiles.Count -gt 0) {
-        if ($modifiedFiles.Count -gt 0) {
-            Write-Host "Modified files: $($modifiedFiles -join ', ')" -ForegroundColor Yellow
-        }
-        if ($deletedFiles.Count -gt 0) {
-            Write-Host "Deleted files: $($deletedFiles -join ', ')" -ForegroundColor Red
-        }
-        if ($addedFiles.Count -gt 0) {
-            Write-Host "Added files: $($addedFiles -join ', ')" -ForegroundColor Green
-        }
-    } else {
-        Write-Host "No changes detected." -ForegroundColor Cyan
-    }
-}
-
-# Function to monitor the directory in real-time
-function Monitor-Directory {
-    param (
-        [string]$Directory
-    )
-
-    # Create a FileSystemWatcher object
-    $watcher = New-Object System.IO.FileSystemWatcher
-    $watcher.Path = $Directory
-    $watcher.Filter = "*.txt"
-    $watcher.IncludeSubdirectories = $false
-    $watcher.EnableRaisingEvents = $true
-
-    # Define actions for events
-    $action = {
-        $eventType = $EventArgs.ChangeType
-        $filePath = $EventArgs.FullPath
-        $fileName = Split-Path $filePath -Leaf
-
-        switch ($eventType) {
-            "Changed" {
-                Write-Host "File modified: $fileName" -ForegroundColor Yellow
-                Verify-Hashes -Directory $Directory
-            }
-            "Created" {
-                Write-Host "File added: $fileName" -ForegroundColor Green
-                Verify-Hashes -Directory $Directory
-            }
-            "Deleted" {
-                Write-Host "File deleted: $fileName" -ForegroundColor Red
-                Verify-Hashes -Directory $Directory
-            }
-            "Renamed" {
-                Write-Host "File renamed: $fileName" -ForegroundColor Magenta
-                Verify-Hashes -Directory $Directory
-            }
-        }
-    }
-
-    # Register events
-    Register-ObjectEvent -InputObject $watcher -EventName Changed -Action $action
-    Register-ObjectEvent -InputObject $watcher -EventName Created -Action $action
-    Register-ObjectEvent -InputObject $watcher -EventName Deleted -Action $action
-    Register-ObjectEvent -InputObject $watcher -EventName Renamed -Action $action
+    $baseline = Get-Content -Path $BASELINE_FILE | ConvertFrom-Json -AsHashtable
 
     Write-Host "Monitoring directory: $Directory" -ForegroundColor Cyan
     Write-Host "Press Ctrl+C to stop monitoring..." -ForegroundColor Cyan
 
-    # Keep the script running
-    try {
-        while ($true) {
-            Start-Sleep -Seconds 1
+    while ($true) {
+        $currentFiles = Get-ChildItem -Path $Directory -Filter *.txt
+        $currentHashes = @{}
+
+        # Calculate hashes for current files
+        $currentFiles | ForEach-Object {
+            $fileHash = Calculate-Hash -FilePath $_.FullName
+            if ($fileHash) {
+                $currentHashes[$_.Name] = $fileHash
+            }
         }
-    } finally {
-        # Clean up
-        Unregister-Event -SourceIdentifier $watcher.Changed
-        Unregister-Event -SourceIdentifier $watcher.Created
-        Unregister-Event -SourceIdentifier $watcher.Deleted
-        Unregister-Event -SourceIdentifier $watcher.Renamed
-        $watcher.Dispose()
+
+        # Check for changes
+        foreach ($filename in $baseline.Keys) {
+            if (-not $currentHashes.ContainsKey($filename)) {
+                Write-Host "File deleted: $filename" -ForegroundColor Red
+            } elseif ($currentHashes[$filename] -ne $baseline[$filename]) {
+                Write-Host "File modified: $filename" -ForegroundColor Yellow
+            }
+        }
+
+        # Check for new files
+        foreach ($filename in $currentHashes.Keys) {
+            if (-not $baseline.ContainsKey($filename)) {
+                Write-Host "File added: $filename" -ForegroundColor Green
+            }
+        }
+
+        Start-Sleep -Seconds 1
     }
 }
 
@@ -158,8 +89,20 @@ if (-not (Test-Path $Directory)) {
     exit
 }
 
-# Generate initial hashes
-Generate-Hashes -Directory $Directory
+# Ask the user what they want to do
+Write-Host "What would you like to do?"
+Write-Host "A. Collect new Baseline"
+Write-Host "B. Begin monitoring files with saved Baseline"
+$choice = Read-Host "Enter your choice (A or B)"
 
-# Start monitoring the directory
-Monitor-Directory -Directory $Directory
+switch ($choice.ToUpper()) {
+    "A" {
+        Collect-Baseline -Directory $Directory
+    }
+    "B" {
+        Monitor-Files -Directory $Directory
+    }
+    default {
+        Write-Host "Invalid choice. Please run the script again and select A or B." -ForegroundColor Red
+    }
+}
