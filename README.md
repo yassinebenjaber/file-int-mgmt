@@ -1,18 +1,21 @@
-# File Integrity Management Tool
+# File Integrity Management Tool (FIM)
 
-A simple Python script to monitor and verify the integrity of files using SHA-256 hashing. This tool detects unauthorized changes to files, such as modifications, deletions, or additions, which could be caused by malware or accidental actions.
+A PowerShell script to monitor and verify the integrity of files in a directory using SHA-256 hashing. This tool detects changes such as file modifications, deletions, additions, and renames, providing real-time alerts with color-coded outputs.
 
 ## Features
-- Generate SHA-256 hashes for files in a directory.
-- Save hashes to a JSON file for future comparison.
-- Verify file integrity by comparing current hashes with saved hashes.
-- Detect and report changes, including:
-  - **Modified files**: Changes to file content.
-  - **Deleted files**: Files that are no longer present.
-  - **Added files**: New files in the directory.
+- **Generate Hashes**: Create SHA-256 hashes for all `.txt` files in a directory and save them to a JSON file.
+- **Verify Integrity**: Compare current file hashes with saved hashes to detect changes.
+- **Real-Time Monitoring**: Monitor the directory for changes in real-time and receive instant alerts.
+- **Color-Coded Alerts**:
+  - **Yellow**: Modified files.
+  - **Red**: Deleted files.
+  - **Green**: Added files.
+  - **Magenta**: Renamed files.
+- **JSON Storage**: Hashes are stored in `hashes.json` for future comparisons.
 
 ## Requirements
-- Python 3.x
+- **PowerShell 5.1** or later.
+- **.NET Framework** (for SHA-256 hashing).
 
 ## Installation
 1. Clone the repository:
@@ -22,24 +25,22 @@ A simple Python script to monitor and verify the integrity of files using SHA-25
    ```bash
    cd file-int-mgmt
   ## Usage
-1. Generate Hashes:
-   To generate hashes for files in a directory and save them to hashes.json:
+1. Generate Hashes + Integrity Verification + Real-time monitoring:
+   To generate SHA-256 hashes for all .txt files in a directory and save them to hashes.json:
    ```bash
-   python file_int_mgmt.py --generate /path/to/directory
-2. Verify Intergreity:
-   To verify the integrity of files by comparing their current hashes with the saved hashes:
-   ```bash
-   python file_int_mgmt.py --verify /path/to/directory
-3. Output:
-   If no changes are detected, the script will output: **All files are intact**.
+   .\file_int_mgmt.ps1 -Directory "C:\path\to\directory"
+2. Output:
+If no changes are detected, the script will output: No changes detected (in cyan).
 
-   If changes are detected, the script will report:
+If changes are detected, the script will report:
 
-     Modified files: Files with changed content.
+ - Modified files: Files with changed content (in yellow).
 
-     Deleted files: Files that are missing.
+ - Deleted files: Files that are missing (in red).
 
-     Added files: New files in the directory.
+ - Added files: New files in the directory (in green).
+
+ - Renamed files: Files that have been renamed (in magenta).
      
 <h2>Languages and Utilities Used</h2>
 
@@ -59,12 +60,16 @@ Flow chart demonstrating the FIM : <br/>
 <img src="https://imgur.com/YsKkgTb.png" height="80%" width="80%" alt="Disk Sanitization Steps"/>
 <br />
 <p align="center" >
-Python function and demontrtaion<br/>
- <img src="https://imgur.com/zfn2fYL.png" height="80%" width="80%" alt="Disk Sanitization Steps"/>
+Testing folder before demonstration<br/>
+ <img src="https://imgur.com/Rx4tgry.png" height="80%" width="80%" alt="Disk Sanitization Steps"/>
+<br />
+  <p align="center" >
+Executing the script / Folder after demonstration<br/>
+ <img src="https://imgur.com/FiBpyod.png" height="80%" width="80%" alt="Disk Sanitization Steps"/>
 <br />
 <br />
 
-
+https://imgur.com/9XbWlyi
 
 </p>
 
