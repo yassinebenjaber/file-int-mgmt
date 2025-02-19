@@ -1,7 +1,7 @@
 # File Integrity Monitoring (FIM) Tool
 
 ## Description
-This tool monitors file integrity by tracking changes in a specified directory. It uses SHA-256 hashing to identify unauthorized file changes, ensuring data integrity and security. The tool can detect file additions, deletions, modifications, and renames.
+In this project i made a tool that monitors file integrity by tracking changes in a specified directory. It uses SHA-256 hashing to identify unauthorized file changes, ensuring data integrity and security. The tool can detect file additions, deletions, modifications, and renames in real-time.
 
 ## How It Works
 1. **Baseline Collection**:  
